@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sys
-from mox import Mox
-from nose.tools import assert_equals
+#from mox import Mox
+from nose.tools import assert_equals, nottest
 
 from lettuce import step
 from lettuce.terrain import after
@@ -253,7 +253,7 @@ def test_feature_hooks_not_invoked_if_no_scenarios_run():
         []
     )
 
-
+@nottest
 def test_after_each_all_is_executed_before_each_all():
     "terrain.before.each_all and terrain.after.each_all decorators"
     import lettuce

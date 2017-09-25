@@ -23,6 +23,8 @@ from lettuce.exceptions import LettuceSyntaxError
 from nose.tools import assert_equals
 from nose.tools import assert_raises
 
+from six.moves import map
+
 
 SCENARIO1 = """
 Scenario: Adding some students to my university database
@@ -435,7 +437,7 @@ def test_full_featured_feature():
     for ((got_examples, got_steps), (expected_examples, expected_steps)) in zip(scenario4.evaluated, expected_evaluated):
         sentences_of = lambda x: x.sentence
         assert_equals(got_examples, expected_examples)
-        assert_equals(map(sentences_of, got_steps), expected_steps)
+        assert_equals(list(map(sentences_of, got_steps)), expected_steps)
 
 def test_scenario_with_table_and_no_step_fails():
     "A step table imediately after the scenario line, without step line fails"

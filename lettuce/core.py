@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from __future__ import print_function
 
 
 import re
@@ -33,23 +34,37 @@ from lettuce.registry import call_hook
 from lettuce.exceptions import ReasonToFail
 from lettuce.exceptions import NoDefinitionFound
 from lettuce.exceptions import LettuceSyntaxError
+import six
+
+from six.moves import filter
 
 fs = FileSystem()
 
 
+def r_u_e(s):
+    # From https://stackoverflow.com/a/26063975
+    try:
+        # Python 2
+        s = s.decode('raw_unicode_escape')
+    except AttributeError:
+        # Python 3
+        pass 
+    return s   
+
+
 class REP(object):
     "RegEx Pattern"
-    first_of = re.compile(ur'^first_of_')
-    last_of = re.compile(ur'^last_of_')
+    first_of = re.compile(r_u_e(r'^first_of_'))
+    last_of = re.compile(r_u_e(r'^last_of_'))
     language = re.compile(u"\s*#\s*language:[ ]*([^\s]+)")
     within_double_quotes = re.compile(r'("[^"]+")')
     within_single_quotes = re.compile(r"('[^']+')")
     only_whitespace = re.compile('^\s*$')
-    last_tag_extraction_regex = re.compile(ur'(?:\s|^)[@](\S+)\s*$')
-    first_tag_extraction_regex = re.compile(ur'^\s*[@](\S+)(?:\s|$)')
-    tag_strip_regex = re.compile(ur'(?:(?:^\s*|\s+)[@]\S+\s*)+$', re.DOTALL)
-    comment_strip1 = re.compile(ur'(^[^\'"]*)[#]([^\'"]*)$')
-    comment_strip2 = re.compile(ur'(^[^\'"]+)[#](.*)$')
+    last_tag_extraction_regex = re.compile(r_u_e(r'(?:\s|^)[@](\S+)\s*$'))
+    first_tag_extraction_regex = re.compile(r_u_e(r'^\s*[@](\S+)(?:\s|$)'))
+    tag_strip_regex = re.compile(r_u_e(r'(?:(?:^\s*|\s+)[@]\S+\s*)+$'), re.DOTALL)
+    comment_strip1 = re.compile(r_u_e(r'(^[^\'"]*)[#]([^\'"]*)$'))
+    comment_strip2 = re.compile(r_u_e(r'(^[^\'"]+)[#](.*)$'))
 
 
 class HashList(list):
@@ -99,7 +114,7 @@ class Language(object):
     def __init__(self, code=u'en'):
         self.code = code
         for attr, value in languages.LANGUAGES[code].items():
-            setattr(self, attr, unicode(value))
+            setattr(self, attr, six.text_type(value))
 
     def __repr__(self):
         return '<Language "%s">' % self.code
@@ -108,7 +123,7 @@ class Language(object):
         for pattern in [REP.first_of, REP.last_of]:
             if pattern.match(attr):
                 name = pattern.sub(u'', attr)
-                return unicode(getattr(self, name, u'').split(u"|")[0])
+                return six.text_type(getattr(self, name, u'').split(u"|")[0])
 
         return super(Language, self).__getattribute__(attr)
 
@@ -132,8 +147,8 @@ class StepDefinition(object):
     gets a few metadata from file, such as filename and line number"""
     def __init__(self, step, function):
         self.function = function
-        self.file = fs.relpath(function.func_code.co_filename)
-        self.line = function.func_code.co_firstlineno + 1
+        self.file = fs.relpath(function.__code__.co_filename)
+        self.line = function.__code__.co_firstlineno + 1
         self.step = step
 
     def __call__(self, *args, **kw):
@@ -235,7 +250,7 @@ class Step(object):
         self.proposed_method_name, self.proposed_sentence = self.propose_definition()
 
     def propose_definition(self):
-        sentence = unicode(self.original_sentence)
+        sentence = six.text_type(self.original_sentence)
         method_name = sentence
 
         groups = [
@@ -253,8 +268,8 @@ class Step(object):
                     method_name = method_name.replace(match, group_name)
                     attribute_names.append(group_name)
 
-        method_name = unicodedata.normalize('NFKD', method_name) \
-                      .encode('ascii', 'ignore')
+        method_name = six.text_type(unicodedata.normalize('NFKD', method_name) \
+                      .encode('ascii', 'ignore'))
         method_name = '%s(step%s)' % (
             "_".join(re.findall("\w+", method_name)).lower(),
             attribute_names and (", %s" % ", ".join(attribute_names)) or "")
@@ -268,7 +283,7 @@ class Step(object):
         for k, v in data.items():
 
             def evaluate(stuff):
-                return stuff.replace(u'<%s>' % unicode(k), unicode(v))
+                return stuff.replace(u'<%s>' % six.text_type(k), six.text_type(v))
 
             def evaluate_hash_value(hash_row):
                 new_row = {}
@@ -346,7 +361,10 @@ class Step(object):
         return u'<Step: "%s">' % self.sentence
 
     def __repr__(self):
-        return unicode(self).encode('utf-8')
+        if six.PY2:
+            return unicode(self).encode('utf-8')
+        else:
+            return self.__unicode__()
 
     def _parse_remaining_lines(self, lines):
         multiline = strings.parse_multiline(lines)
@@ -641,7 +659,10 @@ class Scenario(object):
         return u'<Scenario: "%s">' % self.name
 
     def __repr__(self):
-        return unicode(self).encode('utf-8')
+        if six.PY2:
+            return unicode(self).encode('utf-8')
+        else:
+            return self.__unicode__()
 
     def matches_tags(self, tags):
         if tags is None:
@@ -742,7 +763,7 @@ class Scenario(object):
                 self._report_outline_hook(outline, False)
 
             skip = lambda x: x not in steps_passed and x not in steps_undefined and x not in steps_failed
-            steps_skipped = filter(skip, all_steps)
+            steps_skipped = list(filter(skip, all_steps))
 
             return ScenarioResult(
                 self,
@@ -885,8 +906,8 @@ class Background(object):
                  with_file=None,
                  original_string=None,
                  language=None):
-        self.steps = map(self.add_self_to_step, Step.many_from_lines(
-            lines, with_file, original_string))
+        self.steps = list(map(self.add_self_to_step, Step.many_from_lines(
+            lines, with_file, original_string)))
 
         self.feature = feature
         self.original_string = original_string
@@ -906,7 +927,7 @@ class Background(object):
             try:
                 results.append(step.run(ignore_case))
             except Exception as e:
-                print e
+                print (e)
                 pass
 
             call_hook('after_each', 'step', step)
@@ -1007,9 +1028,9 @@ class Feature(object):
                 scenario.tags.extend(self.tags)
 
     def _find_tags_in(self, original_string):
-        broad_regex = re.compile(ur"([@].*)%s: (%s)" % (
+        broad_regex = re.compile(r_u_e(r"([@].*)%s: (%s)" % (
             self.language.feature,
-            re.escape(self.name)), re.DOTALL)
+            re.escape(self.name))), re.DOTALL)
 
         regexes = [broad_regex]
 
@@ -1037,7 +1058,7 @@ class Feature(object):
         return u'<%s: "%s">' % (self.language.first_of_feature, self.name)
 
     def __repr__(self):
-        return unicode(self).encode('utf-8')
+        return u'<%s: "%s">' % (self.language.first_of_feature, self.name)
 
     def get_head(self):
         return u"%s: %s" % (self.language.first_of_feature, self.name)
@@ -1154,7 +1175,7 @@ class Feature(object):
         # replacing occurrences of Scenario Outline, with just "Scenario"
         scenario_prefix = u'%s:' % self.language.first_of_scenario
         regex = re.compile(
-            ur"%s:[\t\r\f\v]*" % self.language.scenario_separator, re.U | re.I | re.DOTALL)
+            r_u_e(r"%s:[\t\r\f\v]*" % self.language.scenario_separator), re.U | re.I | re.DOTALL)
 
         joined = regex.sub(scenario_prefix, joined)
 

@@ -1,6 +1,7 @@
 """
 Step definitions for working with Django models.
 """
+from __future__ import print_function
 
 from datetime import datetime
 import re
@@ -187,20 +188,20 @@ def _dump_model(model, attrs=None):
     """
 
     for field in model._meta.fields:
-        print '%s=%s,' % (field.name, str(getattr(model, field.name))),
+        print ('%s=%s,' % (field.name, str(getattr(model, field.name))),)
 
     if attrs is not None:
         for attr in attrs:
-            print '%s=%s,' % (attr, str(getattr(model, attr))),
+            print ('%s=%s,' % (attr, str(getattr(model, attr))),)
 
     for field in model._meta.many_to_many:
         vals = getattr(model, field.name)
-        print '%s=%s (%i),' % (
+        print ('%s=%s (%i),' % (
             field.name,
             ', '.join(map(str, vals.all())),
-            vals.count()),
+            vals.count()),)
 
-    print
+    print ()
 
 
 def models_exist(model, data, queryset=None):
@@ -241,11 +242,11 @@ def models_exist(model, data, queryset=None):
                 model.__name__, hash_, filtered.query)
 
     except AssertionError as exc:
-        print exc
+        print (exc)
         failed += 1
 
     if failed:
-        print "Rows in DB are:"
+        print ("Rows in DB are:")
         for model in queryset.all():
             _dump_model(model, extra_attrs.keys())
 

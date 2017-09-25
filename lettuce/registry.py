@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from __future__ import print_function
 import os
 import re
 import threading
@@ -26,8 +27,8 @@ world._set = False
 
 
 def _function_matches(one, other):
-    return (os.path.abspath(one.func_code.co_filename) == os.path.abspath(other.func_code.co_filename) and
-            one.func_code.co_firstlineno == other.func_code.co_firstlineno)
+    return (os.path.abspath(one.__code__.co_filename) == os.path.abspath(other.__code__.co_filename) and
+            one.__code__.co_firstlineno == other.__code__.co_firstlineno)
 
 
 class CallbackDict(dict):
@@ -80,7 +81,7 @@ class StepDict(dict):
         func = getattr(func, '__func__', func)
         sentence = getattr(func, '__doc__', None)
         if sentence is None:
-            sentence = func.func_name.replace('_', ' ')
+            sentence = func.__name__.replace('_', ' ')
             sentence = sentence[0].upper() + sentence[1:]
         return sentence
 
@@ -98,7 +99,7 @@ class StepDict(dict):
 
     def _is_func_or_method(self, func):
         func_dir = dir(func)
-        return callable(func) and ("func_name" in func_dir or "__func__" in func_dir)
+        return callable(func) and ("__name__" in func_dir or "__func__" in func_dir)
 
 
 STEP_REGISTRY = StepDict()
@@ -156,9 +157,9 @@ def call_hook(situation, kind, *args, **kw):
         try:
             callback(*args, **kw)
         except Exception as e:
-            print "=" * 1000
-            traceback.print_exc(e)
-            print
+            print ("=" * 1000)
+            traceback.print_exc()
+            print ()
             raise
 
 

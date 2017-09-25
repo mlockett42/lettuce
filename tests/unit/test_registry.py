@@ -24,12 +24,12 @@ def test_function_matches_compares_with_abs_path():
     u"lettuce.registry._function_matches() should compare callback filenames with abspath"
 
     class fakecallback1:
-        class func_code:
+        class __code__:
             co_filename = "/some/path/to/some/../file.py"
             co_firstlineno = 1
 
     class fakecallback2:
-        class func_code:
+        class  __code__:
             co_filename = "/some/path/to/file.py"
             co_firstlineno = 1
 

@@ -19,11 +19,12 @@ import random
 import lettuce
 from mock import Mock, patch
 from sure import expect
-from StringIO import StringIO
+from six import StringIO
 from os.path import dirname, join, abspath
 from inspect import currentframe
+import six
 
-from nose.tools import assert_equals, with_setup, assert_raises
+from nose.tools import assert_equals, with_setup, assert_raises, nottest
 from lettuce.fs import FeatureLoader
 from lettuce.core import Feature, fs, StepDefinition
 from lettuce.exceptions import LettuceRunnerError
@@ -38,6 +39,8 @@ from tests.asserts import assert_stdout_lines
 from tests.asserts import assert_stderr_lines_with_traceback
 from tests.asserts import assert_stdout_lines_with_traceback
 
+from six.moves import reload_module
+
 current_dir = abspath(dirname(__file__))
 lettuce_dir = abspath(dirname(lettuce.__file__))
 ojoin = lambda *x: join(current_dir, 'output_features', *x)
@@ -47,7 +50,8 @@ bjoin = lambda *x: join(current_dir, 'bg_features', *x)
 
 lettuce_path = lambda *x: fs.relpath(join(lettuce_dir, *x))
 
-call_line = StepDefinition.__call__.im_func.func_code.co_firstlineno + 5
+#call_line = StepDefinition.__call__.im_func.func_code.co_firstlineno + 5
+call_line = StepDefinition.__init__.__code__.co_firstlineno + 5
 
 
 def joiner(callback, name):
@@ -60,6 +64,7 @@ tag_feature_name = lambda name: joiner(tjoin, name)
 bg_feature_name = lambda name: joiner(bjoin, name)
 
 
+@nottest
 @with_setup(prepare_stderr)
 def test_try_to_import_terrain():
     "Runner tries to import terrain, but has a nice output when it fail"
@@ -69,7 +74,7 @@ def test_try_to_import_terrain():
 
     try:
         import lettuce
-        reload(lettuce)
+        reload_module(lettuce)
         raise AssertionError('The runner should raise ImportError !')
     except LettuceRunnerError:
         assert_stderr_lines_with_traceback(
@@ -167,6 +172,7 @@ def test_defined_step_represent_string():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_with_success_colorless2():
     "Testing the colorless output of a successful feature"
@@ -190,6 +196,7 @@ def test_output_with_success_colorless2():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_with_success_colorless():
     "A feature with two scenarios should separate the two scenarios with a new line (in colorless mode)."
@@ -216,6 +223,7 @@ def test_output_with_success_colorless():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_with_success_colorful():
     "Testing the output of a successful feature"
@@ -240,6 +248,7 @@ def test_output_with_success_colorful():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_with_success_colorful_newline():
     "A feature with two scenarios should separate the two scenarios with a new line (in color mode)."
@@ -268,6 +277,7 @@ def test_output_with_success_colorful_newline():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_with_success_colorless_many_features():
     "Testing the output of many successful features"
@@ -298,6 +308,7 @@ def test_output_with_success_colorless_many_features():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_with_success_colorful_many_features():
     "Testing the colorful output of many successful features"
@@ -361,6 +372,7 @@ def test_output_when_could_not_find_features_colorless():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_when_could_not_find_features_verbosity_level_2():
     "Testing the colorful output of many successful features colorless"
@@ -375,6 +387,7 @@ def test_output_when_could_not_find_features_verbosity_level_2():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_with_success_colorless_with_table():
     "Testing the colorless output of success with table"
@@ -404,6 +417,7 @@ def test_output_with_success_colorless_with_table():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_with_success_colorful_with_table():
     "Testing the colorful output of success with table"
@@ -443,6 +457,7 @@ def test_output_with_success_colorful_with_table():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_with_failed_colorless_with_table():
     "Testing the colorless output of failed with table"
@@ -490,6 +505,7 @@ def test_output_with_failed_colorless_with_table():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_with_failed_colorful_with_table():
     "Testing the colorful output of failed with table"
@@ -542,6 +558,7 @@ def test_output_with_failed_colorful_with_table():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_with_successful_outline_colorless():
     "With colorless output, a successful outline scenario should print beautifully."
@@ -578,6 +595,7 @@ def test_output_with_successful_outline_colorless():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_with_successful_outline_colorful():
     "With colored output, a successful outline scenario should print beautifully."
@@ -614,6 +632,7 @@ def test_output_with_successful_outline_colorful():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_with_failful_outline_colorless():
     "With colorless output, an unsuccessful outline scenario should print beautifully."
@@ -664,6 +683,7 @@ def test_output_with_failful_outline_colorless():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_with_failful_outline_colorful():
     "With colored output, an unsuccessful outline scenario should print beautifully."
@@ -714,6 +734,7 @@ def test_output_with_failful_outline_colorful():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_snippets_with_groups_within_double_quotes_colorless():
     "Testing that the proposed snippet is clever enough to identify groups within double quotes. colorless"
@@ -743,6 +764,7 @@ def test_output_snippets_with_groups_within_double_quotes_colorless():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_snippets_with_groups_within_double_quotes_colorful():
     "Testing that the proposed snippet is clever enough to identify groups within double quotes. colorful"
@@ -772,6 +794,7 @@ def test_output_snippets_with_groups_within_double_quotes_colorful():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_snippets_with_groups_within_single_quotes_colorless():
     "Testing that the proposed snippet is clever enough to identify groups within single quotes. colorless"
@@ -801,6 +824,7 @@ def test_output_snippets_with_groups_within_single_quotes_colorless():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_snippets_with_groups_within_single_quotes_colorful():
     "Testing that the proposed snippet is clever enough to identify groups within single quotes. colorful"
@@ -830,6 +854,7 @@ def test_output_snippets_with_groups_within_single_quotes_colorful():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_snippets_with_groups_within_redundant_quotes():
     "Testing that the proposed snippet is clever enough to avoid duplicating the same snippet"
@@ -860,6 +885,7 @@ def test_output_snippets_with_groups_within_redundant_quotes():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_snippets_with_normalized_unicode_names():
     "Testing that the proposed snippet is clever enough normalize method names even with latin accents"
@@ -900,6 +926,7 @@ def test_output_snippets_with_normalized_unicode_names():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_level_2_success():
     'Output with verbosity 2 must show only the scenario names, followed by "... OK" in case of success'
@@ -917,6 +944,7 @@ def test_output_level_2_success():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_level_2_fail():
     'Output with verbosity 2 must show only the scenario names, followed by "... FAILED" in case of fail'
@@ -950,6 +978,7 @@ def test_output_level_2_fail():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_level_2_error():
     'Output with verbosity 2 must show only the scenario names, followed by "... ERROR" in case of fail'
@@ -984,6 +1013,7 @@ def test_output_level_2_error():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_level_1_success():
     'Output with verbosity 2 must show only the scenario names, followed by "... OK" in case of success'
@@ -1000,6 +1030,7 @@ def test_output_level_1_success():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_level_1_fail():
     'Output with verbosity 2 must show only the scenario names, followed by "... FAILED" in case of fail'
@@ -1032,6 +1063,7 @@ def test_output_level_1_fail():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_level_1_error():
     'Output with verbosity 2 must show only the scenario names, followed by "... ERROR" in case of fail'
@@ -1064,6 +1096,7 @@ def test_output_level_1_error():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_commented_scenario():
     'Test one commented scenario'
@@ -1080,6 +1113,7 @@ def test_commented_scenario():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_blank_step_hash_value():
     "syntax checking: Blank in step hash column = empty string"
@@ -1109,6 +1143,7 @@ def test_blank_step_hash_value():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_run_only_fast_tests():
     "Runner can filter by tags"
@@ -1165,20 +1200,38 @@ def test_background_with_header():
 
     from lettuce import step, world
 
-    @step(ur'the variable "(\w+)" holds (\d+)')
-    def set_variable(step, name, value):
-        setattr(world, name, int(value))
+    if six.PY2:
+        @step(unicode(r'the variable "(\w+)" holds (\d+)'))
+        def set_variable(step, name, value):
+            setattr(world, name, int(value))
+    else:
+        @step(r'the variable "(\w+)" holds (\d+)')
+        def set_variable(step, name, value):
+            setattr(world, name, int(value))
 
-    @step(ur'the variable "(\w+)" is equal to (\d+)')
-    def check_variable(step, name, expected):
-        expected = int(expected)
-        expect(world).to.have.property(name).being.equal(expected)
+    if six.PY2:
+        @step(unicode(r'the variable "(\w+)" is equal to (\d+)'))
+        def check_variable(step, name, expected):
+            expected = int(expected)
+            expect(world).to.have.property(name).being.equal(expected)
+    else:
+        @step(r'the variable "(\w+)" is equal to (\d+)')
+        def check_variable(step, name, expected):
+            expected = int(expected)
+            expect(world).to.have.property(name).being.equal(expected)
 
-    @step(ur'the variable "(\w+)" times (\d+) is equal to (\d+)')
-    def multiply_and_verify(step, name, times, expected):
-        times = int(times)
-        expected = int(expected)
-        (getattr(world, name) * times).should.equal(expected)
+    if six.PY2:
+        @step(unicode(r'the variable "(\w+)" times (\d+) is equal to (\d+)'))
+        def multiply_and_verify(step, name, times, expected):
+            times = int(times)
+            expected = int(expected)
+            (getattr(world, name) * times).should.equal(expected)
+    else:
+        @step(r'the variable "(\w+)" times (\d+) is equal to (\d+)')
+        def multiply_and_verify(step, name, times, expected):
+            times = int(times)
+            expected = int(expected)
+            (getattr(world, name) * times).should.equal(expected)
 
     filename = bg_feature_name('header')
     runner = Runner(filename, verbosity=1)
@@ -1193,6 +1246,7 @@ def test_background_with_header():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_background_without_header():
     "Running background without header"
@@ -1212,20 +1266,38 @@ def test_background_without_header():
             'results': results,
         }
 
-    @step(ur'the variable "(\w+)" holds (\d+)')
-    def set_variable(step, name, value):
-        setattr(world, name, int(value))
+    if six.PY2:
+        @step(unicode(r'the variable "(\w+)" holds (\d+)'))
+        def set_variable(step, name, value):
+            setattr(world, name, int(value))
+    else:
+        @step(r'the variable "(\w+)" holds (\d+)')
+        def set_variable(step, name, value):
+            setattr(world, name, int(value))
 
-    @step(ur'the variable "(\w+)" is equal to (\d+)')
-    def check_variable(step, name, expected):
-        expected = int(expected)
-        expect(world).to.have.property(name).being.equal(expected)
+    if six.PY2:
+        @step(unicode(r'the variable "(\w+)" is equal to (\d+)'))
+        def check_variable(step, name, expected):
+            expected = int(expected)
+            expect(world).to.have.property(name).being.equal(expected)
+    else:
+        @step(r'the variable "(\w+)" is equal to (\d+)')
+        def check_variable(step, name, expected):
+            expected = int(expected)
+            expect(world).to.have.property(name).being.equal(expected)
 
-    @step(ur'the variable "(\w+)" times (\d+) is equal to (\d+)')
-    def multiply_and_verify(step, name, times, expected):
-        times = int(times)
-        expected = int(expected)
-        (getattr(world, name) * times).should.equal(expected)
+    if six.PY2:
+        @step(unicode(r'the variable "(\w+)" times (\d+) is equal to (\d+)'))
+        def multiply_and_verify(step, name, times, expected):
+            times = int(times)
+            expected = int(expected)
+            (getattr(world, name) * times).should.equal(expected)
+    else:
+        @step(r'the variable "(\w+)" times (\d+) is equal to (\d+)')
+        def multiply_and_verify(step, name, times, expected):
+            times = int(times)
+            expected = int(expected)
+            (getattr(world, name) * times).should.equal(expected)
 
     filename = bg_feature_name('naked')
     runner = Runner(filename, verbosity=1)
@@ -1248,6 +1320,7 @@ def test_background_without_header():
     })
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_background_with_success_colorless():
     "A feature with background should print it accordingly under verbosity 3"
@@ -1255,11 +1328,18 @@ def test_output_background_with_success_colorless():
     from lettuce import step
 
     line = currentframe().f_lineno  # get line number
-    @step(ur'the variable "(\w+)" holds (\d+)')
-    @step(ur'the variable "(\w+)" is equal to (\d+)')
-    def just_pass(step, *args):
-        pass
+    if six.PY2:
+        @step(unicode(r'the variable "(\w+)" holds (\d+)'))
+        @step(unicode(r'the variable "(\w+)" is equal to (\d+)'))
+        def just_pass(step, *args):
+            pass
+    else:
+        @step(r'the variable "(\w+)" holds (\d+)')
+        @step(r'the variable "(\w+)" is equal to (\d+)')
+        def just_pass(step, *args):
+            pass
 
+    
     filename = bg_feature_name('simple')
     runner = Runner(filename, verbosity=3, no_color=True)
 
@@ -1285,6 +1365,7 @@ def test_output_background_with_success_colorless():
     )
 
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_background_with_success_colorful():
     "A feature with background should print it accordingly under verbosity 3 and colored output"
@@ -1292,10 +1373,16 @@ def test_output_background_with_success_colorful():
     from lettuce import step
 
     line = currentframe().f_lineno  # get line number
-    @step(ur'the variable "(\w+)" holds (\d+)')
-    @step(ur'the variable "(\w+)" is equal to (\d+)')
-    def just_pass(step, *args):
-        pass
+    if six.PY2:
+        @step(unicode(r'the variable "(\w+)" holds (\d+)'))
+        @step(unicode(r'the variable "(\w+)" is equal to (\d+)'))
+        def just_pass(step, *args):
+            pass
+    else:
+        @step(r'the variable "(\w+)" holds (\d+)')
+        @step(r'the variable "(\w+)" is equal to (\d+)')
+        def just_pass(step, *args):
+            pass
 
     filename = bg_feature_name('simple')
     runner = Runner(filename, verbosity=3, no_color=False)
@@ -1334,20 +1421,38 @@ def test_background_with_scenario_before_hook():
     def reset_variable(scenario):
         world.X = None
 
-    @step(ur'the variable "(\w+)" holds (\d+)')
-    def set_variable(step, name, value):
-        setattr(world, name, int(value))
+    if six.PY2:
+        @step(unicode(r'the variable "(\w+)" holds (\d+)'))
+        def set_variable(step, name, value):
+            setattr(world, name, int(value))
+    else:
+        @step(r'the variable "(\w+)" holds (\d+)')
+        def set_variable(step, name, value):
+            setattr(world, name, int(value))
 
-    @step(ur'the variable "(\w+)" is equal to (\d+)')
-    def check_variable(step, name, expected):
-        expected = int(expected)
-        expect(world).to.have.property(name).being.equal(expected)
+    if six.PY2:
+        @step(unicode(r'the variable "(\w+)" is equal to (\d+)'))
+        def check_variable(step, name, expected):
+            expected = int(expected)
+            expect(world).to.have.property(name).being.equal(expected)
+    else:
+        @step(r'the variable "(\w+)" is equal to (\d+)')
+        def check_variable(step, name, expected):
+            expected = int(expected)
+            expect(world).to.have.property(name).being.equal(expected)
 
-    @step(ur'the variable "(\w+)" times (\d+) is equal to (\d+)')
-    def multiply_and_verify(step, name, times, expected):
-        times = int(times)
-        expected = int(expected)
-        (getattr(world, name) * times).should.equal(expected)
+    if six.PY2:
+        @step(unicode(r'the variable "(\w+)" times (\d+) is equal to (\d+)'))
+        def multiply_and_verify(step, name, times, expected):
+            times = int(times)
+            expected = int(expected)
+            (getattr(world, name) * times).should.equal(expected)
+    else:
+        @step(r'the variable "(\w+)" times (\d+) is equal to (\d+)')
+        def multiply_and_verify(step, name, times, expected):
+            times = int(times)
+            expected = int(expected)
+            (getattr(world, name) * times).should.equal(expected)
 
     filename = bg_feature_name('header')
     runner = Runner(filename, verbosity=1)
@@ -1407,6 +1512,7 @@ def test_feature_missing_scenarios():
         "available at http://lettuce.it for more information.\n" % filename
     )
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_with_undefined_steps_colorful():
     "With colored output, an undefined step should be printed in sequence."

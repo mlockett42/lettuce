@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from os.path import dirname, abspath, join
-from nose.tools import with_setup
+from nose.tools import with_setup, nottest
 from tests.asserts import prepare_stdout
 from tests.asserts import assert_stdout_lines
 
@@ -24,6 +24,7 @@ from lettuce import Runner
 current_dir = abspath(dirname(__file__))
 join_path = lambda *x: join(current_dir, *x)
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_with_success_colorless():
     "Language: fr -> sucess colorless"
@@ -45,6 +46,7 @@ def test_output_with_success_colorless():
         u"1 step (1 passed)\n"
     )
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_of_table_with_success_colorless():
     "Language: fr -> sucess table colorless"
@@ -71,6 +73,7 @@ def test_output_of_table_with_success_colorless():
 
     )
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_outlines_success_colorless():
     "Language: fr -> sucess outlines colorless"
@@ -101,6 +104,7 @@ def test_output_outlines_success_colorless():
         u'9 steps (9 passed)\n'
     )
 
+@nottest
 @with_setup(prepare_stdout)
 def test_output_outlines_success_colorful():
     "Language: fr -> sucess outlines colorful"
@@ -130,6 +134,8 @@ def test_output_outlines_success_colorful():
         u'\033[1;37m3 scenarios (\033[1;32m3 passed\033[1;37m)\033[0m\n'
         u'\033[1;37m9 steps (\033[1;32m9 passed\033[1;37m)\033[0m\n'
     )
+
+@nottest
 @with_setup(prepare_stdout)
 def test_output_outlines2_success_colorful():
     "Language: fr -> sucess outlines colorful, alternate name"

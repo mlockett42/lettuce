@@ -19,7 +19,8 @@
 import sys
 import os
 import lettuce
-from StringIO import StringIO
+from six import StringIO
+import six
 
 from nose.tools import assert_equals, assert_true, with_setup
 from sure import expect
@@ -143,8 +144,8 @@ def test_xunit_output_with_no_steps():
     'Test xunit output with no steps'
     called = []
     def assert_correct_xml(filename, content):
-        print filename
-        print content
+        print (filename)
+        print (content)
         called.append(True)
         assert_xsd_valid(filename, content)
         root = etree.fromstring(content)
@@ -184,10 +185,17 @@ def test_xunit_output_with_background_section():
     
     from lettuce import step
     
-    @step(ur'the variable "(\w+)" holds (\d+)')
-    @step(ur'the variable "(\w+)" is equal to (\d+)')
-    def just_pass(step, *args):
-        pass
+    if six.PY2:
+        @step(unicode(r'the variable "(\w+)" holds (\d+)'))
+        @step(unicode(r'the variable "(\w+)" is equal to (\d+)'))
+        def just_pass(step, *args):
+            pass
+    else:
+        @step(r'the variable "(\w+)" holds (\d+)')
+        @step(r'the variable "(\w+)" is equal to (\d+)')
+        def just_pass(step, *args):
+            pass
+
     
     filename = bg_feature_name('simple')
     old = xunit_output.wrt_output

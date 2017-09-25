@@ -16,11 +16,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from lettuce.registry import world
 from lettuce.registry import CALLBACK_REGISTRY
+import six
 world._set = True
 
 
 def absorb(thing, name=None):
-    if not isinstance(name, basestring):
+    if not isinstance(name, six.string_types):
         name = thing.__name__
 
     setattr(world, name, thing)

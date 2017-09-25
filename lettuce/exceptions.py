@@ -17,6 +17,7 @@
 import traceback
 import sys
 from lettuce.strings import utf8_string
+import six
 
 
 class NoDefinitionFound(Exception):
@@ -39,6 +40,7 @@ class ReasonToFail(object):
     """ Exception that contains detailed information about a
     AssertionError raised within a step definition.  With these data
     lettuce show detailed traceback to user in a nice representation.
+
     """
     def __init__(self, step, exc):
         self.step = step
@@ -49,9 +51,9 @@ class ReasonToFail(object):
         else:
             msg = exc.args[0] if exc.args else ''
 
-        if isinstance(msg, basestring):
+        if isinstance(msg, six.text_type):
             self.cause = utf8_string(msg)
-        self.traceback = utf8_string(traceback.format_exc(exc))
+        self.traceback = utf8_string(traceback.format_exc())
 
 
 class LettuceSyntaxError(SyntaxError):

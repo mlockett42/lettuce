@@ -689,11 +689,11 @@ def test_single_scenario_many_scenarios():
     print
     for sr in result.scenario_results:
         for failed in sr.steps_failed:
-            print "+" * 10
+            print ("+" * 10)
             print
-            print failed.why.cause
+            print (failed.why.cause)
             print
-            print "+" * 10
+            print ("+" * 10)
 
     print
     print

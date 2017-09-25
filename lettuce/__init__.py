@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from __future__ import print_function
 
 __version__ = version = '0.2.23'
 
@@ -48,8 +49,13 @@ from lettuce.plugins import (
     smtp_mail_queue,
     jsonreport_output,
 )
-from lettuce import fs
-from lettuce import exceptions
+import six
+if six.PY2:
+    from lettuce import fs
+    from lettuce import exceptions
+else:
+    from . import fs
+    from . import exceptions
 
 try:
     from colorama import init as ms_windows_workaround
@@ -73,13 +79,13 @@ try:
     terrain = fs.FileSystem._import("terrain")
     reload(terrain)
 except Exception as e:
-    if not "No module named terrain" in str(e):
+    if not "No module named terrain" in str(e) and not "No module named 'terrain'" in str(e):
         string = 'Lettuce has tried to load the conventional environment ' \
             'module "terrain"\nbut it has errors, check its contents and ' \
             'try to run lettuce again.\n\nOriginal traceback below:\n\n'
 
         sys.stderr.write(string)
-        sys.stderr.write(exceptions.traceback.format_exc(e))
+        sys.stderr.write(exceptions.traceback.format_exc())
         raise LettuceRunnerError(string)
 
 
@@ -169,7 +175,7 @@ class Runner(object):
         try:
             self.loader.find_and_load_step_definitions()
         except StepLoadingError as e:
-            print "Error loading step definitions:\n", e
+            print ("Error loading step definitions:\n", e)
             return
 
         call_hook('before', 'all')
@@ -187,16 +193,16 @@ class Runner(object):
         except exceptions.LettuceSyntaxError as e:
             sys.stderr.write(e.msg)
             failed = True
-        except exceptions.NoDefinitionFound, e:
+        except exceptions.NoDefinitionFound as e:
             sys.stderr.write(e.msg)
             failed = True
         except:
             if not self.failfast:
                 e = sys.exc_info()[1]
-                print "Died with %s" % str(e)
+                print ("Died with %s" % str(e))
                 traceback.print_exc()
             else:
-                print
+                print ()
                 print ("Lettuce aborted running any more tests "
                        "because was called with the `--failfast` option")
 

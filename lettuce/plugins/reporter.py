@@ -1,4 +1,5 @@
 import sys
+import six
 
 
 class Reporter(object):
@@ -7,8 +8,9 @@ class Reporter(object):
         self.scenarios_and_its_fails = {}
 
     def wrt(self, what):
-        if isinstance(what, unicode):
-            what = what.encode('utf-8')
+        if six.PY2:
+            if isinstance(what, unicode):
+                what = what.encode('utf-8')
         sys.stdout.write(what)
 
     def store_failed_step(self, step):

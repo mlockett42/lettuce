@@ -21,6 +21,7 @@ import sys
 import codecs
 import fnmatch
 import zipfile
+from six.moves import reload_module
 
 from functools import wraps
 from glob import glob
@@ -64,7 +65,7 @@ class FeatureLoader(object):
                               .format(e, filename)),
                     raise e
 
-            reload(module)  # always take fresh meat :)
+            reload_module(module)  # always take fresh meat :)
             sys.path.remove(root)
 
     def find_feature_files(self):

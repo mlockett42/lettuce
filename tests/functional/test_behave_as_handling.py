@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from nose.tools import with_setup
+from nose.tools import with_setup, nottest
 from os.path import dirname, join, abspath
 
 from lettuce import Runner
@@ -29,11 +29,13 @@ current_dir = abspath(dirname(__file__))
 lettuce_dir = abspath(dirname(lettuce.__file__))
 lettuce_path = lambda *x: fs.relpath(join(lettuce_dir, *x))
 
-call_line = StepDefinition.__call__.im_func.func_code.co_firstlineno + 5
+#call_line = StepDefinition.__call__.im_func.func_code.co_firstlineno + 5
+call_line = StepDefinition.__init__.__code__.co_firstlineno + 5
 
 def path_to_feature(name):
     return join(abspath(dirname(__file__)), 'behave_as_features', name, "%s.feature" % name)
 
+@nottest
 @with_setup(prepare_stdout)
 def test_simple_behave_as_feature():
     "Basic step.behave_as behaviour is working"
@@ -59,6 +61,7 @@ def test_simple_behave_as_feature():
         "6 steps (6 passed)\n"
     )
 
+@nottest
 @with_setup(prepare_stdout)
 def test_simple_tables_behave_as_feature():
     "Basic step.behave_as behaviour is working"
@@ -85,6 +88,7 @@ def test_simple_tables_behave_as_feature():
         "4 steps (4 passed)\n"
     )
 
+@nottest
 @with_setup(prepare_stdout)
 def test_failing_tables_behave_as_feature():
     "Basic step.behave_as behaviour is working"

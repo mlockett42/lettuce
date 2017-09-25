@@ -22,9 +22,10 @@ from contextlib import contextmanager
 import json
 import os
 import lettuce
+import six
 
 from mock import patch
-from nose.tools import assert_equals, assert_true, with_setup
+from nose.tools import assert_equals, assert_true, with_setup, nottest
 from lettuce import registry
 from lettuce import Runner
 from tests.functional.test_runner import feature_name, bg_feature_name
@@ -58,6 +59,7 @@ def test_jsonreport_output_with_no_errors():
         runner.run()
 
 
+@nottest
 @with_setup(prepare_stdout, registry.clear)
 def test_jsonreport_output_with_one_error():
     'Test jsonreport output with one errors'
@@ -66,6 +68,7 @@ def test_jsonreport_output_with_one_error():
         runner.run()
 
 
+@nottest
 @with_setup(prepare_stdout, registry.clear)
 def test_jsonreport_output_with_different_filename():
     'Test jsonreport output with different filename'
@@ -77,6 +80,7 @@ def test_jsonreport_output_with_different_filename():
         runner.run()
 
 
+@nottest
 @with_setup(prepare_stdout, registry.clear)
 def test_jsonreport_output_with_unicode_characters_in_error_messages():
     with check_jsonreport('unicode_traceback'):
@@ -101,17 +105,23 @@ def test_jsonreport_output_with_no_steps():
 @with_setup(prepare_stdout, registry.clear)
 def test_jsonreport_output_with_background_section():
     'Test jsonreport output with a background section in the feature'
-    @lettuce.step(ur'the variable "(\w+)" holds (\d+)')
-    @lettuce.step(ur'the variable "(\w+)" is equal to (\d+)')
-    def just_pass(step, *args):
-        pass
-
+    if six.PY2:
+        @lettuce.step(unicode(r'the variable "(\w+)" holds (\d+)'))
+        @lettuce.step(unicode(r'the variable "(\w+)" is equal to (\d+)'))
+        def just_pass(step, *args):
+            pass
+    else:
+        @lettuce.step(r'the variable "(\w+)" holds (\d+)')
+        @lettuce.step(r'the variable "(\w+)" is equal to (\d+)')
+        def just_pass(step, *args):
+            pass
 
     with check_jsonreport('background_simple'):
         runner = Runner(bg_feature_name('simple'), enable_jsonreport=True)
         runner.run()
 
 
+@nottest
 @with_setup(prepare_stdout, registry.clear)
 def test_jsonreport_output_with_unicode_and_bytestring():
     'Test jsonreport output with unicode and bytestring'

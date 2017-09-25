@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import sys
-from StringIO import StringIO
-from mox import Mox
-from nose.tools import assert_equals
+from six import StringIO
+#from mox import Mox
+from nose.tools import assert_equals, nottest
 from nose.tools import assert_raises
 from lettuce import fs as io
 
@@ -22,6 +22,7 @@ def test_instance_stack_is_not_the_same_as_class_level():
     MyFs.stack.append('bar')
     assert_equals(MyFs().stack, [])
 
+@nottest
 def test_pushd_appends_current_dir_to_stack_if_empty():
     "Default behaviour of pushd() is adding the current dir to the stack"
     mox = Mox()
@@ -48,6 +49,7 @@ def test_pushd_appends_current_dir_to_stack_if_empty():
     finally:
         io.os = old_os
 
+@nottest
 def test_pushd():
     "FileSystem.pushd"
     mox = Mox()
@@ -70,6 +72,7 @@ def test_pushd():
     finally:
         io.os = old_os
 
+@nottest
 def test_pop_with_more_than_1_item():
     "FileSystem.popd with more than 1 item"
     mox = Mox()
@@ -91,6 +94,7 @@ def test_pop_with_more_than_1_item():
     finally:
         io.os = old_os
 
+@nottest
 def test_pop_with_1_item():
     "FileSystem.pop behaviour with only one item"
     mox = Mox()
@@ -110,6 +114,7 @@ def test_pop_with_1_item():
     finally:
         io.os = old_os
 
+@nottest
 def test_pop_with_no_item():
     "FileSystem.pop behaviour without items in stack"
     mox = Mox()
@@ -144,6 +149,7 @@ def test_dirname():
     got = io.FileSystem.dirname('/path/to/filename.jpg')
     assert_equals(got, '/path/to')
 
+@nottest
 def test_exists():
     "FileSystem.exists"
     mox = Mox()
@@ -160,6 +166,7 @@ def test_exists():
     finally:
         io.exists = old_exists
 
+@nottest
 def test_extract_zip_non_verbose():
     "FileSystem.extract_zip non-verbose"
     mox = Mox()
@@ -215,6 +222,7 @@ def test_extract_zip_non_verbose():
     finally:
         mox.UnsetStubs()
 
+@nottest
 def test_extract_zip_verbose():
     "FileSystem.extract_zip verbose"
     mox = Mox()
@@ -277,6 +285,7 @@ def test_extract_zip_verbose():
         mox.UnsetStubs()
         sys.stdout = sys.__stdout__
 
+@nottest
 def test_locate_non_recursive():
     "FileSystem.locate non-recursive"
     mox = Mox()
@@ -301,6 +310,7 @@ def test_locate_non_recursive():
         mox.UnsetStubs()
         io.glob = old_glob
 
+@nottest
 def test_locate_recursive():
     "FileSystem.locate recursive"
     mox = Mox()
@@ -329,6 +339,7 @@ def test_locate_recursive():
     finally:
         mox.UnsetStubs()
 
+@nottest
 def test_mkdir_success():
     "FileSystem.mkdir with success"
     mox = Mox()
@@ -347,6 +358,7 @@ def test_mkdir_success():
     finally:
         mox.UnsetStubs()
 
+@nottest
 def test_mkdir_ignore_dirs_already_exists():
     "FileSystem.mkdir in a existent dir"
     mox = Mox()
@@ -370,6 +382,7 @@ def test_mkdir_ignore_dirs_already_exists():
     finally:
         mox.UnsetStubs()
 
+@nottest
 def test_mkdir_raises_on_oserror_errno_not_17():
     "FileSystem.mkdir raises on errno not 17"
     mox = Mox()
@@ -393,6 +406,7 @@ def test_mkdir_raises_on_oserror_errno_not_17():
     finally:
         mox.UnsetStubs()
 
+@nottest
 def tes_mkdir_raises_when_path_is_not_a_dir():
     "Test mkdir raises when path is not a dir"
     mox = Mox()

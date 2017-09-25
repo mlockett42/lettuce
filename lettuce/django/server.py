@@ -14,16 +14,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from __future__ import print_function
 import os
 import sys
 import time
 import socket
-import httplib
-import urlparse
+import six
+from six.moves import http_client
+from six.moves.urllib.parse import urljoin
 import tempfile
 import multiprocessing
 
-from StringIO import StringIO
+from six import StringIO
 
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIHandler
@@ -143,7 +145,7 @@ class ThreadedServer(multiprocessing.Process):
 
         while True:
             time.sleep(0.1)
-            http = httplib.HTTPConnection(address, self.port, timeout=1)
+            http = http_client.HTTPConnection(address, self.port, timeout=1)
             try:
                 http.request("GET", "/")
             except socket.error:
@@ -182,7 +184,7 @@ class ThreadedServer(multiprocessing.Process):
             finally:
                 os.unlink(pidfile)
 
-        open(pidfile, 'w').write(unicode(os.getpid()))
+        open(pidfile, 'w').write(six.text_type(os.getpid()))
 
         self.configure_mail_queue()
 
@@ -246,7 +248,7 @@ class BaseServer(object):
 
     def __init__(self, address='0.0.0.0', port=None, threading=True):
         self.port = int(port or getattr(settings, 'LETTUCE_SERVER_PORT', 8000))
-        self.address = unicode(address)
+        self.address = six.text_type(address)
         self.threading = threading
 
     def start(self):
@@ -291,7 +293,7 @@ class DefaultServer(BaseServer):
             if getattr(settings, 'LETTUCE_SERVE_ADMIN_MEDIA', False):
                 msg += ' (as per settings.LETTUCE_SERVE_ADMIN_MEDIA=True)'
 
-            print "%s..." % msg
+            print ("%s..." % msg)
 
         self._server.start()
         self._server.wait()
@@ -306,7 +308,7 @@ class DefaultServer(BaseServer):
                 'python manage.py --no-server' % addrport,
             )
 
-        print "Django's builtin server is running at %s:%d" % addrport
+        print ("Django's builtin server is running at %s:%d" % addrport)
 
     def stop(self, fail=False):
         pid = self._server.pid
@@ -324,7 +326,7 @@ class DefaultServer(BaseServer):
         if self.port is not 80:
             base_url += ':%d' % self.port
 
-        return urlparse.urljoin(base_url, url)
+        return urljoin(base_url, url)
 
 
 try:
@@ -349,9 +351,9 @@ try:
                                               port=self.port)
             LiveServerTestCase.setUpClass()
 
-            print "Django's builtin server is running at {address}:{port}".format(
+            print ("Django's builtin server is running at {address}:{port}".format(
                 address=self.address,
-                port=self.port)
+                port=self.port))
 
         def stop(self, fail=False):
             LiveServerTestCase.tearDownClass()
@@ -361,7 +363,7 @@ try:
             return 0
 
         def url(self, url=''):
-            return urlparse.urljoin(
+            return urljoin(
                 'http://{address}:{port}/'.format(address=self.address,
                                                   port=self.port),
                 url)
