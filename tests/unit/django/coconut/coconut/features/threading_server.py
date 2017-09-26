@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import urllib
+from six.moves import urllib
 import time
 
 from lettuce import step
@@ -21,7 +21,7 @@ class ThreadUrlVisit(Thread):
         self.start_time = time.time()
 
         try:
-            resp = urllib.urlopen(self.url)
+            resp = urllib.request.urlopen(self.url)
             assert_equals(resp.read(), "OK")
         finally:
             self.end_time = time.time()
