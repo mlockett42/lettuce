@@ -7,6 +7,7 @@ from lettuce import step
 from lettuce.django import django_url
 from threading import Thread, activeCount
 from nose.tools import *
+from six.moves import xrange
 
 class ThreadUrlVisit(Thread):
     def __init__(self, url):

@@ -30,7 +30,7 @@ class Reporter(object):
             self.wrt("\n")
             for scenario in self.failed_scenarios:
                 reason = self.scenarios_and_its_fails[scenario]
-                self.wrt(unicode(reason.step))
+                self.wrt(six.text_type(reason.step))
                 self.wrt("\n")
                 self.wrt(reason.traceback)
 

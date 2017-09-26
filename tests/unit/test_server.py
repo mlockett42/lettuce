@@ -18,11 +18,11 @@ import lettuce
 import os
 import subprocess
 import sys
-from nose.tools import assert_equals, nottest
+from nose.tools import assert_equals
 from lettuce.fs import FileSystem
 
 current_directory = FileSystem.dirname(__file__)
-@nottest
+#@nottest
 def test_server_threading():
     """
     Test django httpd threading
