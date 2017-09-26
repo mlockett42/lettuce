@@ -17,8 +17,9 @@
 import lettuce
 import lettuce.fs
 from lettuce.exceptions import LettuceRunnerError
-from nose.tools import assert_equals, nottest
-#from mox import Mox
+from nose.tools import assert_equals
+from mox3.mox import Mox
+from six.moves import reload_module
 
 
 def test_has_version():
@@ -38,7 +39,6 @@ def test_import():
     assert_equals(os, module)
 
 
-@nottest
 def test_terrain_import_exception():
     "lettuce error tries to import "
 
@@ -54,7 +54,7 @@ def test_terrain_import_exception():
 
     exc = Exception('foo bar')
     lettuce.fs.FileSystem._import('terrain').AndRaise(exc)
-    lettuce.exceptions.traceback.format_exc(exc). \
+    lettuce.exceptions.traceback.format_exc(). \
         AndReturn('I AM THE TRACEBACK FOR IMPORT ERROR')
 
     lettuce.sys.stderr.write(string)
@@ -63,7 +63,7 @@ def test_terrain_import_exception():
     mox.ReplayAll()
 
     try:
-        reload(lettuce)
+        reload_module(lettuce)
     except LettuceRunnerError:
         mox.VerifyAll()
 
