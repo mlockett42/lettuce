@@ -1,4 +1,4 @@
-Django==1.9.4
+Django==1.11.5
 Jinja2==2.8
 Pygments==1.5
 Sphinx==1.1.3
