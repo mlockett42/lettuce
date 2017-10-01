@@ -23,11 +23,7 @@ release = 'kryptonite'
 import os
 import sys
 import traceback
-try:
-    from imp import reload
-except ImportError:
-    # python 2.5 fallback
-    pass
+from six.moves import reload_module
 
 import random
 
@@ -77,7 +73,7 @@ __all__ = [
 
 try:
     terrain = fs.FileSystem._import("terrain")
-    reload(terrain)
+    reload_module(terrain)
 except Exception as e:
     if not "No module named terrain" in str(e) and not "No module named 'terrain'" in str(e):
         string = 'Lettuce has tried to load the conventional environment ' \
@@ -149,7 +145,7 @@ class Runner(object):
         if enable_jsonreport:
             jsonreport_output.enable(filename=jsonreport_filename)
 
-        reload(output)
+        reload_module(output)
 
         self.output = output
 

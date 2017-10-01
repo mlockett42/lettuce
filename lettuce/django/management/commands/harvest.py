@@ -143,7 +143,7 @@ class Command(BaseCommand):
         else:
             paths = harvest_lettuces(apps_to_run, apps_to_avoid)  # list of tuples with (path, app_module)
 
-        return paths
+        return list(paths)
 
     def handle(self, *args, **options):
         setup_test_environment()
@@ -171,7 +171,7 @@ class Command(BaseCommand):
 
             from django.test.utils import get_runner
             self._testrunner = get_runner(settings)(interactive=False)
-            self._testrunner.setup_test_environment()
+            #self._testrunner.setup_test_environment()
             self._old_db_config = self._testrunner.setup_databases()
 
             if DJANGO_VERSION < StrictVersion('1.7'):
@@ -200,7 +200,7 @@ class Command(BaseCommand):
         registry.call_hook('before', 'harvest', locals())
         results = []
         try:
-            for path in paths:
+            for path in list(paths):
                 app_module = None
                 if isinstance(path, tuple) and len(path) is 2:
                     path, app_module = path

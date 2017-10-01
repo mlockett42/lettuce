@@ -57,13 +57,19 @@ class FeatureLoader(object):
                 module = __import__(to_load)
             except ValueError as e:
                 import traceback
-                err_msg = traceback.format_exc(e)
+                err_msg = traceback.format_exc()
                 if 'empty module name' in err_msg.lower():
                     continue
                 else:
                     e.args = ('{0} when importing {1}'
                               .format(e, filename)),
                     raise e
+            except Exception as e:
+                print ("Unknown exception caught e=",e)
+                import traceback
+                err_msg = traceback.format_exc()
+                print ("Unknown exception message=",err_msg)
+                raise e
 
             reload_module(module)  # always take fresh meat :)
             sys.path.remove(root)
